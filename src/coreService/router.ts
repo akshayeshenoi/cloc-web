@@ -7,7 +7,7 @@ import { CoreService } from './index';
  * 
  * @class CoreRouter
  */
-class CoreRouter {
+export class CoreRouter {
   // exported router object
   public router: Router;
   
@@ -17,9 +17,9 @@ class CoreRouter {
    * 
    * @memberof CoreRouter
    */
-  constructor() {
+  constructor(coreService: CoreService) {
     this.router = Router();
-    this.initCoreRouter();
+    this.initCoreRouter(coreService);
   }
 
   /**
@@ -28,11 +28,8 @@ class CoreRouter {
    * @private
    * @memberof CoreRouter
    */
-  private initCoreRouter(): void {
-    const coreService = new CoreService();
-    this.router.get('/', coreService.getRoot);
-    this.router.get('/cloc/:gitURL', coreService.cloc);
+  private initCoreRouter(coreService: CoreService): void {
+    this.router.get('/', coreService.getRoot.bind(coreService));
+    this.router.get('/cloc', coreService.cloc.bind(coreService));
   }
 }
-
-export default new CoreRouter().router;

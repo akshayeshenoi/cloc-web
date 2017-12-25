@@ -3,7 +3,7 @@ import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
 
 // import routers from services
-import CoreRouter from './service-1/router'
+import { CoreService } from './coreService'
 
 /**
  * Bootstraps an ExpressJS web server
@@ -14,6 +14,8 @@ import CoreRouter from './service-1/router'
 class App {
 
   public express: express.Application;
+  private config;
+  private coreService: CoreService;
 
   /**
    * Creates an instance of App.
@@ -25,6 +27,8 @@ class App {
     this.express = express();
     this.loadConfig();
     this.middleware();
+    
+    this.coreService = new CoreService(this.config.os);
     this.routes();
   }
 
@@ -36,7 +40,11 @@ class App {
    * @private
    * @memberof App
    */
-  private loadConfig(): void { }
+  private loadConfig(): void { 
+    this.config = {
+      os: '*nix'
+    }
+  }
 
   /**
    * Configure express middlewares
@@ -65,7 +73,7 @@ class App {
     });
 
     this.express.use('/', router);
-    this.express.use('/v1/core', CoreRouter);
+    this.express.use('/core/v1', this.coreService.coreRouter.router);
   }
 
 }

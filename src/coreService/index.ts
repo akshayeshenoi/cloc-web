@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-const exec = require('child_process').exec;
+import { execFile } from 'child_process';
+import * as fs from 'fs';
+
+import { CoreRouter } from './router';
 
 /**
  * Add request handlers and/or business logic here
@@ -9,12 +12,23 @@ const exec = require('child_process').exec;
  * @class CoreService
  */
 export class CoreService {
+  public coreRouter: CoreRouter;
+  private shellScript: string;
+
   /**
    * Creates an instance of CoreService.
-   * 
+   * Create temp dir for cloning
+   * @param {string} os 
    * @memberof CoreService
    */
-  constructor() {}
+  constructor(os: string) {
+    // init router
+    this.coreRouter = new CoreRouter(this);
+    if (!fs.existsSync('temp')) fs.mkdirSync('temp');
+
+    // *nix command
+    this.shellScript = os == '*nix' ? 'cloc.sh' : 'cloc.bat';
+  }
 
   /**
    * Example of request handler
@@ -37,9 +51,12 @@ export class CoreService {
    * @memberof CoreService
    */
   public cloc(req: Request, res: Response, next: NextFunction): void {
-    exec('time', function (err, stdout, stderr) {
-      console.log(stdout);
-      res.send([stdout, req.params.gitURL);
+    const gitURL: string = req.query.gitURL;
+    const repo = gitURL.substr(gitURL.lastIndexOf('/') + 1);
+
+    execFile(this.shellScript, [gitURL, repo], (err, stdout, stderr) => {
+      if (stderr.length > 0) console.log(stderr) ;      
+      res.send([stdout, repo, stderr]);
     });
   }
 }
