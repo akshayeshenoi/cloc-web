@@ -3,8 +3,7 @@ import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
 
 // import routers from services
-import S1Router from './service-1/router'
-import S2Router from './service-2/router'
+import CoreRouter from './service-1/router'
 
 /**
  * Bootstraps an ExpressJS web server
@@ -66,8 +65,7 @@ class App {
     });
 
     this.express.use('/', router);
-    this.express.use('/v1/s1', S1Router);
-    this.express.use('/v1/s2', S2Router);
+    this.express.use('/v1/core', CoreRouter);
   }
 
 }

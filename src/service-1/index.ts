@@ -1,21 +1,20 @@
 import { Request, Response, NextFunction } from 'express';
+const exec = require('child_process').exec;
 
 /**
  * Add request handlers and/or business logic here
  * Follow Node's req, res, next pattern
  * 
  * @export
- * @class Service1
+ * @class CoreService
  */
-export class Service1 {
+export class CoreService {
   /**
-   * Creates an instance of Service1.
+   * Creates an instance of CoreService.
    * 
-   * @memberof Service1
+   * @memberof CoreService
    */
-  constructor() {
-
-  }
+  constructor() {}
 
   /**
    * Example of request handler
@@ -23,9 +22,24 @@ export class Service1 {
    * @param {Request} req 
    * @param {Response} res 
    * @param {NextFunction} next 
-   * @memberof Service1
+   * @memberof CoreService
    */
   public getRoot(req: Request, res: Response, next: NextFunction): void {
-    res.send('Hello from Service1!');
+    res.send('Hello from CoreService!');
+  }
+
+  /**
+   * Fetches git url from request and execs cloc command
+   * 
+   * @param {Request} req 
+   * @param {Response} res 
+   * @param {NextFunction} next 
+   * @memberof CoreService
+   */
+  public cloc(req: Request, res: Response, next: NextFunction): void {
+    exec('time', function (err, stdout, stderr) {
+      console.log(stdout);
+      res.send([stdout, req.params.gitURL);
+    });
   }
 }

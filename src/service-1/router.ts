@@ -1,37 +1,38 @@
 import { Router } from 'express';
 // import main class
-import { Service1 } from './index';
+import { CoreService } from './index';
 
 /**
  * Maintains all the routes against the functions
  * 
- * @class S1Router
+ * @class CoreRouter
  */
-class S1Router {
+class CoreRouter {
   // exported router object
   public router: Router;
   
   /**
-   * Creates an instance of S1Router.
+   * Creates an instance of CoreRouter.
    * Initializes routes
    * 
-   * @memberof S1Router
+   * @memberof CoreRouter
    */
   constructor() {
     this.router = Router();
-    this.initS1Routes();
+    this.initCoreRouter();
   }
 
   /**
-   * Creates an instance of ConfigurationService and maps functions to routes
+   * Creates an instance of CoreService and maps functions to routes
    * 
    * @private
-   * @memberof S1Router
+   * @memberof CoreRouter
    */
-  private initS1Routes(): void {
-    const s1 = new Service1();
-    this.router.get('/', s1.getRoot);
+  private initCoreRouter(): void {
+    const coreService = new CoreService();
+    this.router.get('/', coreService.getRoot);
+    this.router.get('/cloc/:gitURL', coreService.cloc);
   }
 }
 
-export default new S1Router().router;
+export default new CoreRouter().router;
