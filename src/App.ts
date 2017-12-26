@@ -4,6 +4,7 @@ import * as bodyParser from 'body-parser';
 
 // import routers from services
 import { CoreService } from './coreService'
+import { request } from 'https';
 
 /**
  * Bootstraps an ExpressJS web server
@@ -14,7 +15,7 @@ import { CoreService } from './coreService'
 class App {
 
   public express: express.Application;
-  private config;
+  private appConfig: ConfigObject;
   private coreService: CoreService;
 
   /**
@@ -25,25 +26,22 @@ class App {
    */
   constructor() {
     this.express = express();
-    this.loadConfig();
+    this.config();
     this.middleware();
-    
-    this.coreService = new CoreService(this.config.os);
     this.routes();
   }
-
+  
   /**
    * Load configuration based on environment
-   * cloud -> load from manifest
-   * dev -> localConfig.json
    * 
    * @private
    * @memberof App
    */
-  private loadConfig(): void { 
-    this.config = {
-      os: '*nix'
-    }
+  private config(): void {
+    this.appConfig = require('./config');
+    // add basedirectory to the config object
+    this.appConfig.baseDir = __dirname;
+    this.coreService = new CoreService(this.appConfig);
   }
 
   /**
@@ -80,3 +78,9 @@ class App {
 
 // exports a new instance of the app
 export default new App().express;
+
+// interfaces
+export interface ConfigObject {
+  os: string,
+  baseDir: string
+}

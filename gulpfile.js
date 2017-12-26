@@ -12,7 +12,7 @@ gulp.task('clean', () => {
 // compile to js and pipe to dist
 gulp.task('build', ['clean'], (cb) => {
   exec('node node_modules/typescript/bin/tsc', function (err, stdout, stderr) {
-    gulp.src(['package.json']).pipe(gulp.dest('dist'));
+    gulp.src(['package.json', 'src/config.json', 'src/cloc.sh']).pipe(gulp.dest('dist'));
     cb(stdout)
   });
 });

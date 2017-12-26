@@ -3,6 +3,7 @@ import { execFile } from 'child_process';
 import * as fs from 'fs';
 
 import { CoreRouter } from './router';
+import { ConfigObject } from '../App'
 
 /**
  * Add request handlers and/or business logic here
@@ -14,20 +15,27 @@ import { CoreRouter } from './router';
 export class CoreService {
   public coreRouter: CoreRouter;
   private shellScript: string;
+  private baseDir: string;
 
   /**
    * Creates an instance of CoreService.
    * Create temp dir for cloning
-   * @param {string} os 
+   * 
+   * @param {Object} config
    * @memberof CoreService
    */
-  constructor(os: string) {
-    // init router
-    this.coreRouter = new CoreRouter(this);
-    if (!fs.existsSync('temp')) fs.mkdirSync('temp');
+  constructor(config: ConfigObject) {
+    const baseDir = config.baseDir;
 
-    // *nix command
-    this.shellScript = os == '*nix' ? 'cloc.sh' : 'cloc.bat';
+    // check if folder exists -> else create one
+    if (!fs.existsSync(baseDir + '/temp')) fs.mkdirSync(baseDir + '/temp');
+    
+    // pick shell script depending upon os
+    // @TODO: implement .bat
+    this.shellScript = (config.os == '*nix') ? 'cloc.sh' : 'cloc.bat';
+    this.baseDir = config.baseDir;
+
+    this.coreRouter = new CoreRouter(this);
   }
 
   /**
@@ -51,12 +59,18 @@ export class CoreService {
    * @memberof CoreService
    */
   public cloc(req: Request, res: Response, next: NextFunction): void {
+    const script = this.baseDir + '/' + this.shellScript;
     const gitURL: string = req.query.gitURL;
     const repo = gitURL.substr(gitURL.lastIndexOf('/') + 1);
 
-    execFile(this.shellScript, [gitURL, repo], (err, stdout, stderr) => {
-      if (stderr.length > 0) console.log(stderr) ;      
-      res.send([stdout, repo, stderr]);
+    execFile(script, [gitURL, repo] ,{cwd: this.baseDir}, (err, stdout, stderr) => {
+      if (err !== null) {
+        console.log([err, stderr]);
+        res.send([err, stderr]);
+      } else {
+        const body = JSON.parse(stdout)
+        res.send(body);
+      }
     });
   }
 }
