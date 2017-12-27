@@ -65,10 +65,10 @@ export class CoreService {
 
     execFile(script, [gitURL, repo] ,{cwd: this.baseDir}, (err, stdout, stderr) => {
       if (err !== null) {
-        console.log([err, stderr]);
-        res.send([err, stderr]);
+        console.log({err: err, stderr: stderr, stdout: stdout});
+        res.send({err: err, stderr: stderr, stdout: stdout});
       } else {
-        const body = JSON.parse(stdout)
+        const body = JSON.parse(stdout);
         res.send(body);
       }
     });
